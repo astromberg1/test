@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Authors App</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <div>
+        <h2>All Authors</h2>
+        <ul id="products" />
+    </div>
+    <div>
+        <h2>Search by ID</h2>
+        <input type="text" id="prodId" size="5" />
+        <input type="button" value="Search" onclick="find()" />
+        <p id="product" />
+    </div>
+    <div>
+        <h2>Ta bort författare</h2>
+
+       
+        <button onclick="deleteauthors()">Ta bort alla markerade</button>
+    </div>
+
+    
+    <h4>add author</h4>
+        <div> </div>
+        firstname <input type="text" id="fname"/>
+        lastname <input type="text" id="lname"/>
+        <input type="button" value="spara" onclick="addauthor()"/>
+    
+    <div id="result"></div>
+
+    <div id="valda"></div>
+
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+    <script>
+        var uri = 'api/Books';
+
+        $(document).ready(function () {
+            $('#products').empty();
+            //send an AJAX request
+            $.getJSON('api/Books/Getall')
+            .done(function(data){
+                //On success, data contains a list of products.
+                $.each(data, function (key, item) {
+                    //Add a list item for the product.
+                    $('<li>', { html: "<input type='checkbox'>" + " " + item.FirstName + " " + item.LastName }).appendTo($('#products'));
+                });
+            });
+        });
+        function formatItem(item){
+            return item.FirstName + ' ' + item.LastName;
+        }
+
+        function deleteauthors() {
+            var selected = [];
+            $('<li>').find("input[type=checkbox][checked]").each(function () {
+                                selected.push($(this).html());
+                
+            });
+
+
+            $.each(selected, function (key, data) {
+                //Add a list item for the product.
+                $( { text:data }).appendTo($('#results'));
+            });
+
+            //$.ajax({
+            //    url: 'api/Books/PostPerson',
+            //    type: 'POST',
+            //    dataType,
+            //    data: person,
+            //    success: function (result) {
+            //        console.log(result);
+            //        $('#products').empty();
+            //        $.getJSON('api/Books/Getall')
+            //            .done(function (data) {
+            //                //On success, data contains a list of products.
+            //                $.each(data, function (key, item) {
+            //                    //Add a list item for the product.
+            //                    $('<li>', { html: "<input type='checkbox'>" + " " + item.FirstName + " " + item.LastName }).appendTo($('#products'));
+            //                });
+            //            });
+            //    }
+
+            //});
+
+        }
+
+        function addauthor() {
+
+            var input1 = document.getElementById("fname").value;
+            var input2 = document.getElementById("lname").value;
+
+            var person={};
+
+            person.fname = input1;
+            person.lname = input2;
+
+     
+         
+            $.ajax({
+                url: 'api/Books/PostPerson',
+                type: 'POST',
+                data: person,
+                success: function (result) {
+                    console.log(result);
+            $('<li>', {html:"<input type='checkbox'>"+ " "+ input1+" " +input2 }).appendTo($('#products'));
+                            
+                        
+                }
+              
+            });
+
+           
+           
+
+
+          
+        }
+
+        function find() {
+            var id = $('#prodId').val();
+            $.postJSON(uri + '/' + id)
+                .done(function (data) {
+                    $('#product').text(formatItem(data));
+                })
+                .fail(function (jqXHR, textStatus, err) {
+                    $('#product').text('Error: ' + err);
+                });
+        }
+
+          //var person = {
+            //    'fname': 'anders',
+            //    'lname': 'test'
+            //}
+
+            //person["fname"] = input1;
+            //person["lname"] = input2;
+    </script>
+
+</body>
+</html>
+
+          
+
